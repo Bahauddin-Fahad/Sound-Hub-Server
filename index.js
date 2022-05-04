@@ -39,6 +39,13 @@ async function run() {
       const inventory = await inventoryCollection.findOne(query);
       res.send(inventory);
     });
+
+    // Adding Item to the database
+    app.post("/inventory", async (req, res) => {
+      const newInventory = req.body;
+      const result = await inventoryCollection.insertOne(newInventory);
+      res.send(result);
+    });
   } finally {
   }
 }
