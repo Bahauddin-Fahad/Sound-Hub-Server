@@ -54,6 +54,33 @@ async function run() {
       const result = await inventoryCollection.deleteOne(query);
       res.send(result);
     });
+
+    // Updating the Details of Inventory
+    app.put("/inventory/:id", async (req, res) => {
+      const inventoryId = req.params.id;
+      const updatedQuantity = req.body;
+      const filter = { _id: ObjectId(inventoryId) };
+      const options = { upsert: true };
+      const updatedDoc = {
+        $set: {
+          quantity: updatedQuantity.quantity,
+        },
+      };
+      const result = await inventoryCollection.updateOne(
+        filter,
+        updatedDoc,
+        options
+      );
+      res.send(result);
+    });
+
+    // // Getting Items of user
+    // app.get("/myInventory", async (req, res) => {
+    //   const query = { email: req.email };
+    //   const cursor = inventoryCollection.find(query);
+    //   const inventories = await cursor.toArray();
+    //   res.send(inventories);
+    // });
   } finally {
   }
 }
