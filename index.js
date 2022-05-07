@@ -34,8 +34,8 @@ async function run() {
 
     // Getting a single inventory item from db
     app.get("/inventory/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: ObjectId(id) };
+      const inventoryId = req.params.id;
+      const query = { _id: ObjectId(inventoryId) };
       const inventory = await inventoryCollection.findOne(query);
       res.send(inventory);
     });
@@ -44,6 +44,14 @@ async function run() {
     app.post("/inventory", async (req, res) => {
       const newInventory = req.body;
       const result = await inventoryCollection.insertOne(newInventory);
+      res.send(result);
+    });
+
+    //Deleting an Item from DataBase
+    app.delete("/inventory/:id", async (req, res) => {
+      const inventoryId = req.params.id;
+      const query = { _id: ObjectId(inventoryId) };
+      const result = await inventoryCollection.deleteOne(query);
       res.send(result);
     });
   } finally {
