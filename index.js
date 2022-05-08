@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -9,8 +10,13 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 app.use(cors());
 app.use(express.json());
 
-// User: SoundHub-server
-// PASS: SKf38JMGGE5MQGyT;
+function verifyToken(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send("Can't Authorize The Access");
+  }
+  next();
+}
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@clustersoundhub.abk9x.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
@@ -23,6 +29,15 @@ async function run() {
   try {
     await client.connect();
     const inventoryCollection = client.db("soundHub").collection("inventories");
+
+    // Authenction By JWT
+    app.post("/login", async (req, res) => {
+      const user = req.body;
+      const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ accessToken });
+    });
 
     // Getting All The inventories from DB
     app.get("/inventories", async (req, res) => {
@@ -75,7 +90,8 @@ async function run() {
     });
 
     // // Getting Items of user
-    app.get("/myItems", async (req, res) => {
+    app.get("/myItems", verifyToken, async (req, res) => {
+      const authHeader = req.headers.authorization;
       const email = req.query.email;
       const query = { email: email };
       const cursor = inventoryCollection.find(query);
