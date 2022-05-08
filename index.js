@@ -55,7 +55,7 @@ async function run() {
       res.send(result);
     });
 
-    // Updating the Details of Inventory
+    // Updating the Details of Item
     app.put("/inventory/:id", async (req, res) => {
       const inventoryId = req.params.id;
       const updatedQuantity = req.body;
@@ -75,12 +75,13 @@ async function run() {
     });
 
     // // Getting Items of user
-    // app.get("/myInventory", async (req, res) => {
-    //   const query = { email: req.email };
-    //   const cursor = inventoryCollection.find(query);
-    //   const inventories = await cursor.toArray();
-    //   res.send(inventories);
-    // });
+    app.get("/myItems", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const cursor = inventoryCollection.find(query);
+      const myItems = await cursor.toArray();
+      res.send(myItems);
+    });
   } finally {
   }
 }
